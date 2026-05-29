@@ -1,7 +1,8 @@
-import { app, configureApp } from '../server/app';
+import { app } from '../server/app';
+import { errorHandler } from '../server/middleware/errorHandler';
 
-// Ensure the App is configured with routing middleware and error handlers
-await configureApp(app);
+// On Vercel, register the error handler directly to capture API route errors
+app.use(errorHandler);
 
 // Export the Express app instance for Vercel Serverless hosting
 export default app;
