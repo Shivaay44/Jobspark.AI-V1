@@ -1,0 +1,8 @@
+{
+  "name": "Remix: Jobspark.AI",
+  "description": "A world-class AI Career Coach, ATS Resume Expert, and Hiring Consultant for Indian and global job markets.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
