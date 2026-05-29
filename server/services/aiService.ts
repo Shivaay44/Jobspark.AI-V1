@@ -91,13 +91,13 @@ async function executeWithRetryAndFallback<T>(
 ): Promise<T> {
   const models = ["gemini-3.5-flash", "gemini-3.1-flash-lite", "gemini-flash-latest"];
   let lastError: any = null;
+  const isVercel = !!process.env.VERCEL;
 
   for (let mIndex = 0; mIndex < models.length; mIndex++) {
     const model = models[mIndex];
-    // We retry up to 2 times (3 attempts total) for the primary model,
-    // and up to 1 retry (2 attempts total) for fallback models.
-    const maxRetries = mIndex === 0 ? 2 : 1;
-    let delay = 1000;
+    // Reduce retries in Vercel environment to fit under the strict 10s gateway timeout
+    const maxRetries = isVercel ? 0 : (mIndex === 0 ? 2 : 1);
+    let delay = isVercel ? 200 : 1000;
 
     for (let attempt = 0; attempt <= maxRetries; attempt++) {
       try {
@@ -155,6 +155,7 @@ export async function generateCareerResponse(
 ) {
   const client = getAiClient();
   const prompt = buildCareerPrompt(message);
+  const isVercel = !!process.env.VERCEL;
 
   const result = await executeWithRetryAndFallback(async (model) => {
     const chat = client.chats.create({
@@ -169,7 +170,7 @@ export async function generateCareerResponse(
 
     return await withTimeout(
       chat.sendMessage({ message: prompt }),
-      30000
+      isVercel ? 8000 : 30000
     );
   });
 
@@ -226,6 +227,7 @@ export async function generateResumeAnalysis(resumeText: string, jobDescription?
   if (jobDescription) {
     prompt += `\n\nMatch it against this Job Description:\n\n${jobDescription}\n\n`;
   }
+  const isVercel = !!process.env.VERCEL;
 
   const model = {
     generateContent: async (promptText: string) => {
@@ -248,7 +250,7 @@ export async function generateResumeAnalysis(resumeText: string, jobDescription?
               temperature: 0.8,
             }
           }),
-          30000
+          isVercel ? 8000 : 30000
         );
       });
     }
@@ -276,6 +278,7 @@ Original Content:
 ${content}
 
 Return ONLY the improved text. Do not provide preface, notes, lists, or markdown wrapper blocks. Just raw, polished paragraphs ready to be pasted inside the resume.`;
+  const isVercel = !!process.env.VERCEL;
 
   const result = await executeWithRetryAndFallback(async (modelName) => {
     return await withTimeout(
@@ -287,7 +290,7 @@ Return ONLY the improved text. Do not provide preface, notes, lists, or markdown
           temperature: 0.8,
         }
       }),
-      30000
+      isVercel ? 8000 : 30000
     );
   });
 
