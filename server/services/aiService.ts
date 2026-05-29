@@ -61,7 +61,8 @@ function isRetryableError(error: any): boolean {
     message.includes('unavailable') ||
     message.includes('high demand') ||
     message.includes('temporary') ||
-    message.includes('try again')
+    message.includes('try again') ||
+    message.includes('timeout')
   ) {
     return true;
   }
@@ -95,9 +96,9 @@ async function executeWithRetryAndFallback<T>(
 
   for (let mIndex = 0; mIndex < models.length; mIndex++) {
     const model = models[mIndex];
-    // Reduce retries in Vercel environment to fit under the strict 10s gateway timeout
-    const maxRetries = isVercel ? 0 : (mIndex === 0 ? 2 : 1);
-    let delay = isVercel ? 200 : 1000;
+    // With maxDuration set to 60s on Vercel, we can allow 1 retry for the primary model
+    const maxRetries = isVercel ? (mIndex === 0 ? 1 : 0) : (mIndex === 0 ? 2 : 1);
+    let delay = isVercel ? 500 : 1000;
 
     for (let attempt = 0; attempt <= maxRetries; attempt++) {
       try {
@@ -170,7 +171,7 @@ export async function generateCareerResponse(
 
     return await withTimeout(
       chat.sendMessage({ message: prompt }),
-      isVercel ? 8000 : 30000
+      isVercel ? 40000 : 30000
     );
   });
 
@@ -250,7 +251,7 @@ export async function generateResumeAnalysis(resumeText: string, jobDescription?
               temperature: 0.8,
             }
           }),
-          isVercel ? 8000 : 30000
+          isVercel ? 40000 : 30000
         );
       });
     }
@@ -290,7 +291,7 @@ Return ONLY the improved text. Do not provide preface, notes, lists, or markdown
           temperature: 0.8,
         }
       }),
-      isVercel ? 8000 : 30000
+      isVercel ? 40000 : 30000
     );
   });
 
