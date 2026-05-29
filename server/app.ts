@@ -119,6 +119,9 @@ app.get('/api/ping', (_, res) => {
 // API Routes
 app.use('/api', aiRoutes);
 
+// Register the error handler directly to ensure all routes are captured
+app.use(errorHandler);
+
 // Vite Dev Middleware
 export async function configureApp(app: express.Express) {
   if (process.env.NODE_ENV !== "production") {
@@ -136,8 +139,6 @@ export async function configureApp(app: express.Express) {
       res.sendFile(path.join(distPath, 'index.html'));
     });
   }
-
-  app.use(errorHandler);
 }
 
 export { app };
