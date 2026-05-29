@@ -73,7 +73,13 @@ app.use(
         origin.endsWith('.run.app') ||
         origin.endsWith('.google.sh') ||
         origin.endsWith('.google.com') ||
-        origin.includes('google.com');
+        origin.includes('google.com') ||
+        origin.endsWith('.vercel.app') ||
+        origin.endsWith('.vercel.dev') ||
+        origin.includes('vercel.app') ||
+        origin.includes('vercel.dev') ||
+        origin.includes('vercel') ||
+        process.env.NODE_ENV !== 'production';
 
       if (isAllowed) {
         return callback(null, true);
