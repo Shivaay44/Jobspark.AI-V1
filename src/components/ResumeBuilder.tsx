@@ -14,7 +14,8 @@ import { EducationStep } from './resume/EducationStep';
 import { SkillsStep } from './resume/SkillsStep';
 import { ProjectsStep } from './resume/ProjectsStep';
 import { ResumePreview } from './resume/ResumePreview';
-import { saveResume } from '../services/resumeService';
+import { saveResume, loadResumeFromCloud } from '../services/resumeService';
+import { useFirebase } from './FirebaseProvider';
 import { usePlan } from '../hooks/usePlan';
 import { useAutoSave } from '../hooks/useAutoSave';
 
@@ -59,6 +60,20 @@ export default function ResumeBuilder() {
     resumeData
   );
 
+  const { user } = useFirebase();
+
+  // Load cloud resume if user is authenticated/signs in
+  useEffect(() => {
+    if (user) {
+      loadResumeFromCloud().then((cloudResume) => {
+        if (cloudResume) {
+          setResumeData(cloudResume);
+          toast.success('Loaded saved progress from Firebase Cloud!');
+        }
+      });
+    }
+  }, [user, setResumeData]);
+
   const { plan, canGenerateResume, usage, limits, upgradeToPro } = usePlan();
   const [isSaving, setIsSaving] = useState(false);
   const [showBuilderUpgradeModal, setShowBuilderUpgradeModal] = useState(false);
@@ -80,14 +95,19 @@ export default function ResumeBuilder() {
   };
 
   const handleSaveToCloud = async () => {
+    if (!user) {
+      toast.error('Please Sign In using Google first to save your resume to the Firebase Cloud!');
+      return;
+    }
+
     setIsSaving(true);
-    const toastId = toast.loading('Mirroring current resume progress into Supabase Security Layer...');
+    const toastId = toast.loading('Mirroring current resume progress into Firebase Firestore...');
     try {
       await saveResume(resumeData);
-      toast.success('Resume draft successfully saved in your Supabase cloud table!', { id: toastId });
+      toast.success('Resume draft successfully saved in your Firebase Firestore database!', { id: toastId });
     } catch (err: any) {
-      console.error('Supabase cloud error:', err);
-      toast.error(`Cloud backup error: ${err.message || 'Check credentials in settings'}`, { id: toastId });
+      console.error('Firebase save error:', err);
+      toast.error(`Cloud backup error: ${err.message || 'Check database permissions'}`, { id: toastId });
     } finally {
       setIsSaving(false);
     }

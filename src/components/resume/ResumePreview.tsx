@@ -549,13 +549,13 @@ export function ResumePreview({ content, data, onRegenerate, isGenerating }: Pro
 
   const handleSaveToCloud = async () => {
     setIsSaving(true);
-    const toastId = toast.loading('Saving draft...');
+    const toastId = toast.loading('Saving draft in Firebase Firestore...');
     try {
       await saveResume(data);
-      toast.success('Draft saved successfully', { id: toastId });
+      toast.success('Draft saved successfully to Firestore Cloud', { id: toastId });
     } catch (err: any) {
-      console.error('Supabase save error:', err);
-      toast.error('Unable to save draft', { id: toastId });
+      console.error('Firebase save error:', err);
+      toast.error('Unable to save draft. Please check if you are signed in.', { id: toastId });
     } finally {
       setIsSaving(false);
     }

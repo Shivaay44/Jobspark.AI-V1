@@ -64,28 +64,9 @@ const allowedOrigins = [
 app.use(
   cors({
     origin(origin, callback) {
-      if (!origin) return callback(null, true);
-
-      const isAllowed =
-        allowedOrigins.includes(origin) ||
-        origin.includes('localhost') ||
-        origin.includes('127.0.0.1') ||
-        origin.endsWith('.run.app') ||
-        origin.endsWith('.google.sh') ||
-        origin.endsWith('.google.com') ||
-        origin.includes('google.com') ||
-        origin.endsWith('.vercel.app') ||
-        origin.endsWith('.vercel.dev') ||
-        origin.includes('vercel.app') ||
-        origin.includes('vercel.dev') ||
-        origin.includes('vercel') ||
-        process.env.NODE_ENV !== 'production';
-
-      if (isAllowed) {
-        return callback(null, true);
-      }
-
-      callback(new Error('Not allowed by CORS'));
+      // Dynamically echo back the request origin to allow clean cross-origin requests
+      // in preview environments, sandboxes, and custom domains.
+      callback(null, true);
     },
     credentials: true,
   })

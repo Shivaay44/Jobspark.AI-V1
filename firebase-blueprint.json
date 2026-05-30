@@ -1,0 +1,58 @@
+{
+  "entities": {
+    "Resume": {
+      "title": "Resume",
+      "description": "User's resume document structure",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string", "description": "Title of the resume" },
+        "ownerId": { "type": "string", "description": "UID of the owner" },
+        "content": { "type": "object", "description": "JSON representation of ResumeData" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Timestamp of creation" },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Timestamp of last update" }
+      },
+      "required": ["title", "ownerId", "content", "createdAt", "updatedAt"]
+    },
+    "ChatHistory": {
+      "title": "ChatHistory",
+      "description": "User's chat session history",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "UID of the user" },
+        "messages": { "type": "array", "description": "List of chat messages" },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Timestamp of last message" }
+      },
+      "required": ["userId", "messages", "updatedAt"]
+    },
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "User profile settings and upgrade state",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "UID of the user" },
+        "fullName": { "type": "string", "description": "Full name of the user" },
+        "email": { "type": "string", "description": "Email address of the user" },
+        "phone": { "type": "string", "description": "Phone number of the user" },
+        "location": { "type": "string", "description": "Location of the user" },
+        "linkedin": { "type": "string", "description": "LinkedIn profile link" },
+        "portfolio": { "type": "string", "description": "Portfolio website link" },
+        "isPro": { "type": "boolean", "description": "Pro status of the user" }
+      },
+      "required": ["userId", "email"]
+    }
+  },
+  "firestore": {
+    "/resumes/{resumeId}": {
+      "schema": "Resume",
+      "description": "Collection of resumes owned by users"
+    },
+    "/chats/{chatId}": {
+      "schema": "ChatHistory",
+      "description": "User chat histories"
+    },
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "User profile documents stored under their UID"
+    }
+  }
+}

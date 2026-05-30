@@ -15,7 +15,7 @@ function getNormalizedBaseUrl(url: string | undefined): string {
   ) {
     return '';
   }
-  return cleaned;
+  return cleaned.replace(/\/+$/, '');
 }
 
 export const API_CONFIG = {
