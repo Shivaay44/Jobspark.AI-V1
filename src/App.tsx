@@ -16,14 +16,14 @@ import { useFirebase } from './components/FirebaseProvider';
 type View = 'assistant' | 'builder' | 'tools';
 
 const navItems = [
-  { id: 'assistant', label: 'AI Assistant', icon: MessageSquare },
   { id: 'builder', label: 'Resume Builder', icon: FileText },
+  { id: 'assistant', label: 'AI Assistant', icon: MessageSquare },
   { id: 'tools', label: 'Career Tools', icon: Target },
 ];
 
 export default function App() {
   const { user, loading, logout } = useFirebase();
-  const [activeView, setActiveView] = useState<View>('assistant');
+  const [activeView, setActiveView] = useState<View>('builder');
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(() => {
     if (typeof window !== 'undefined') {
