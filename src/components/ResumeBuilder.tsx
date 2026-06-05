@@ -136,7 +136,7 @@ export default function ResumeBuilder() {
 
   if (!hasStarted) {
     return (
-      <div id="hero-section" className="h-full flex flex-col justify-center items-center py-12 md:py-24 px-4 bg-gradient-to-b from-slate-950/20 via-transparent to-slate-950/20">
+      <div id="hero-section" className="min-h-full flex flex-col justify-center items-center py-12 md:py-20 px-4 bg-gradient-to-b from-slate-950/20 via-transparent to-slate-950/20">
         <div className="max-w-4xl mx-auto text-center space-y-10">
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
@@ -153,7 +153,7 @@ export default function ResumeBuilder() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="font-sans font-extrabold text-4xl sm:text-5xl md:text-6xl tracking-tight text-white leading-tight bg-gradient-to-r from-white via-indigo-100 to-indigo-300 bg-clip-text text-transparent"
+            className="font-sans font-extrabold text-4xl sm:text-5xl md:text-6xl tracking-tight leading-tight bg-gradient-to-r from-white via-indigo-100 to-indigo-300 bg-clip-text text-transparent [-webkit-background-clip:text] [-webkit-text-fill-color:transparent]"
           >
             Build ATS-Optimized Professional Resumes with AI
           </motion.h1>
@@ -162,7 +162,7 @@ export default function ResumeBuilder() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="text-lg md:text-xl text-slate-300 text-center max-w-2xl mx-auto leading-relaxed font-normal"
+            className="text-lg md:text-xl text-slate-200 text-center max-w-2xl mx-auto leading-relaxed font-normal"
           >
             Generate recruiter-ready resumes instantly with premium templates, AI-enhanced writing, and one-click PDF export.
           </motion.p>
@@ -219,6 +219,26 @@ export default function ResumeBuilder() {
               <p className="text-slate-400 text-xs">Download professional PDF copies instantly, fully styled.</p>
             </div>
           </motion.div>
+
+          {/* Fully Polished SEO Landing Content Section */}
+          <motion.section 
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.5 }}
+            className="text-left max-w-3xl mx-auto mt-20 p-6 sm:p-8 rounded-3xl bg-slate-900/40 border border-white/5 space-y-5"
+          >
+            <h2 className="font-sans font-extrabold text-xl md:text-2xl text-white tracking-tight">
+              AI Resume Builder for Modern Job Seekers
+            </h2>
+            
+            <p className="text-slate-300 text-sm leading-relaxed">
+              Jobspark AI is a premium, <strong>Free Resume Builder</strong> and intelligent <strong>ATS Resume Builder</strong> engineered to help job seekers generate stand-out, recruiter-approved career documents. With our next-generation <strong>Resume Generator</strong>, creating a <strong>Professional Resume</strong> or crafting custom <strong>Resume Templates</strong> takes only minutes. Our models analyze industry guidelines to refine and structure your summary, projects, and work history automatically.
+            </p>
+
+            <p className="text-slate-300 text-sm leading-relaxed">
+              Whether you are a student or a fresher compiling your showcase draft with an intuitive <strong>CV Builder</strong> or <strong>AI CV Generator</strong>, or a highly experienced software engineer, medical professional, executive, educator, or manager, Jobspark AI guides you seamlessly. Save your progress directly in secure cloud databases, customize styling features dynamically, and assemble a <strong>Job Application Resume</strong> using our professional <strong>Resume Maker</strong> with instant PDF downloads.
+            </p>
+          </motion.section>
         </div>
       </div>
     );
