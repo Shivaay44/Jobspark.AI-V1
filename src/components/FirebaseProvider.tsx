@@ -96,9 +96,16 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       setLoading(true);
       await loginWithGoogle();
       toast.success('Successfully signed in with Google!');
-    } catch (error) {
-      toast.error('Google Sign-in failed');
+    } catch (error: any) {
+      let friendlyMsg = 'Google Sign-in failed';
+      if (error && error.code === 'auth/unauthorized-domain') {
+        friendlyMsg = 'Unauthorized Domain: This website domain must be added to your Firebase Authorized Domains';
+      } else if (error && error.code === 'auth/popup-blocked') {
+        friendlyMsg = 'Popup block active. Please allow popups for this site.';
+      }
+      toast.error(friendlyMsg);
       setLoading(false);
+      throw error;
     }
   };
 
@@ -108,7 +115,11 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       await loginWithEmailAndPassword(email, pass);
       toast.success('Successfully signed in!');
     } catch (error: any) {
-      toast.error(error.message || 'Email Sign-in failed');
+      let friendlyMsg = error.message || 'Email Sign-in failed';
+      if (error && error.code === 'auth/operation-not-allowed') {
+        friendlyMsg = 'Email/Password authentication provider is disabled in your Firebase console. Please enable it under Auth > Sign-in method.';
+      }
+      toast.error(friendlyMsg);
       setLoading(false);
       throw error;
     }
@@ -117,10 +128,30 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const signUpWithEmail = async (email: string, pass: string, fullName: string) => {
     try {
       setLoading(true);
-      await signUpWithEmailAndPassword(email, pass, fullName);
+      const user = await signUpWithEmailAndPassword(email, pass, fullName);
+      if (user) {
+        // Explicitly write/overwrite the profile with the active full name to prevent empty displayName races in onAuthStateChanged
+        const profileRef = doc(db, 'users', user.uid);
+        const initialProfile: UserProfile = {
+          userId: user.uid,
+          fullName: fullName,
+          email: user.email || email,
+          phone: '',
+          location: '',
+          linkedin: '',
+          portfolio: '',
+          isPro: false,
+        };
+        await setDoc(profileRef, initialProfile);
+        setProfile(initialProfile);
+      }
       toast.success('Successfully registered and signed in!');
     } catch (error: any) {
-      toast.error(error.message || 'Registration failed');
+      let friendlyMsg = error.message || 'Registration failed';
+      if (error && error.code === 'auth/operation-not-allowed') {
+        friendlyMsg = 'Email/Password authentication provider is disabled in your Firebase console. Please enable it under Auth > Sign-in method.';
+      }
+      toast.error(friendlyMsg);
       setLoading(false);
       throw error;
     }

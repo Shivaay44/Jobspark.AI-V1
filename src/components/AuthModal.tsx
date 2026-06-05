@@ -68,6 +68,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
         friendlyError = 'The password is too weak.';
       } else if (err.code === 'auth/invalid-email') {
         friendlyError = 'Please enter a valid email address.';
+      } else if (err.code === 'auth/operation-not-allowed') {
+        friendlyError = `Email/Password sign-in is disabled in your Firebase Console. \n\nTo enable it:\n1. Open your Firebase Console.\n2. Go to Build > Authentication > Sign-in method.\n3. Click "Add new provider" and choose "Email/Password".\n4. Enable it and save!`;
       } else if (err.message) {
         friendlyError = err.message;
       }
@@ -83,9 +85,19 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
     try {
       await login();
       onClose();
-    } catch (err) {
-      console.error(err);
-      setError('Google Sign-In failed');
+    } catch (err: any) {
+      console.error('Google Sign In Catch:', err);
+      let friendlyError = 'Google Sign-In failed. Please try again.';
+      if (err && err.code === 'auth/unauthorized-domain') {
+        friendlyError = `This website domain (${window.location.hostname}) is not authorized in your Firebase Project configuration. \n\nTo fix this: Please go to the Firebase Console > Authentication > Settings > Authorized Domains, and add "${window.location.hostname}" there. \n\nAlternatively, you can instantly register or sign in with an Email and Password using the tabs above!`;
+      } else if (err && err.code === 'auth/popup-blocked') {
+        friendlyError = 'The browser locked your authentication popup. Please disable popup-blockers for this tab, or register/login with your Email and Password below.';
+      } else if (err && err.code === 'auth/popup-closed-by-user') {
+        friendlyError = 'Login popup was closed before completion. Please try again or log in via Email.';
+      } else if (err && err.message) {
+        friendlyError = `Google Sign-In Error: ${err.message}`;
+      }
+      setError(friendlyError);
     } finally {
       setLoading(false);
     }
@@ -154,7 +166,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
 
           {/* Error Message */}
           {error && (
-            <div className="mb-4 p-3 bg-rose-500/10 border border-rose-500/20 rounded-xl flex items-start gap-2.5 text-xs text-rose-300">
+            <div className="mb-4 p-3 bg-rose-500/10 border border-rose-500/20 rounded-xl flex items-start gap-2.5 text-xs text-rose-300 whitespace-pre-line">
               <AlertCircle size={16} className="mt-0.5 shrink-0" />
               <span>{error}</span>
             </div>
