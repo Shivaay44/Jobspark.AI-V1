@@ -26,57 +26,34 @@ export async function generateResumeContent(data: ResumeData) {
   const fullName = data.personalInfo?.fullName?.trim() || "Candidate";
   const headline = data.personalInfo?.headline?.trim() || "Full Stack Developer";
 
-  const prompt = `You are a world-class senior resume writer. Create a highly professional, ATS-friendly resume.
+  const prompt = `You are a professional resume writer. 
 
-Return **ONLY valid JSON**. No markdown block formatting, no extra commentary, no explanations. 
+**STRICT FIDELITY RULES** (never break):
+- Name: exactly **${fullName}**
+- Headline: exactly **${headline}**
+- Use ONLY the data below. Do not mix with any other person or previous tests.
+- Never add unrelated professions (no surgeon, doctor, etc.).
 
-Ensure the output is robust, matching this interface:
-{
-  "name": "${fullName}",
-  "headline": "${headline}",
-  "summary": "Professional summary paragraph. 1st person implied, telemetry-free, recruiter-attractive.",
-  "experience": [
-    {
-      "company": "Company Name",
-      "role": "Job Title",
-      "startDate": "Start Date (e.g., Oct 2021)",
-      "endDate": "End Date or Present",
-      "bullets": [
-        "First professional achievement bullet starting with active verb and including result/impact. At least 12-25 words.",
-        "Second professional achievement bullet starting with active verb."
-      ]
-    }
-  ],
-  "skills": ["TypeScript", "React", "Node.js"],
-  "education": [
-    {
-      "school": "University Name",
-      "degree": "Degree Title",
-      "year": "Graduation Year"
-    }
-  ],
-  "projects": [
-    {
-      "name": "Project Name",
-      "bullets": ["First project achievement bullet.", "Second project bullet."],
-      "technologies": ["React", "Tailwind CSS"]
-    }
-  ]
-}
+**ENHANCEMENT RULES**:
+- Write a strong 4-6 line professional summary.
+- For each experience: create **4-5 strong achievement bullets** using action verbs and metrics where logical.
+- Improve projects with 2-3 good bullets each.
 
-CRITICAL RULES:
-1. DO NOT include candidate name, resume title, section headings, or markdown headings inside the generated string text values.
-2. Only generate pure content for each section. For example, "summary" must contain ONLY summary text (no header title), "experience" bullets must contain ONLY the bullet text themselves (no asterisks, lists, etc.).
-3. Keep experience bullets professional and achievement-oriented (Action Verb + Responsibility + Result + Impact). Each bullet must contain at least 12-20 words.
-4. If some lists in user data are empty, professionally expand them based on target role or keep them aligned with target profile.
+**User Data (use only this)**:
+${JSON.stringify(data, null, 2)}
 
-User Data:
-${JSON.stringify(data, null, 2)}`;
+Output clean Markdown resume only.`;
 
-  const systemInstruction = `Always output clean, professional structured JSON only. Never output Markdown prose or explanations. Follow the exact JSON schema requested.`;
+  const systemInstruction = `Strict resume writer. Always respect exact name and headline. Enhance content intelligently but stay truthful to provided data. Never hallucinate unrelated details.`;
 
   const response = await sendChatMessage(prompt, [], systemInstruction);
-  return response.text;
+  let text = response.text;
+
+  // Cleanup any leakage
+  text = text.replace(/```[\s\S]*?```/g, '').trim();
+  text = text.replace(/"name":|"headline":/gi, '');
+
+  return text;
 }
 
 export async function analyzeResume(resumeText: string, jobDescription?: string) {
